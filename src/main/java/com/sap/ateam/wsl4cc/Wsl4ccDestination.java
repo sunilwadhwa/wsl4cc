@@ -9,7 +9,7 @@ import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoRepository;
 
-public class Rest4ccDestination {
+public class Wsl4ccDestination {
 
 	public static JCoDestination getDestination(String dest) {
         try {
@@ -38,5 +38,5 @@ public class Rest4ccDestination {
         return func;
 	}
 
-    private static Logger logger = LoggerFactory.getLogger(Rest4ccDestination.class);
+    private static Logger logger = LoggerFactory.getLogger(Wsl4ccDestination.class);
 }

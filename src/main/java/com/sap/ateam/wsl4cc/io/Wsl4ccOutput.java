@@ -2,7 +2,7 @@ package com.sap.ateam.wsl4cc.io;
 
 import java.util.Map;
 
-public class Rest4ccOutput {
+public class Wsl4ccOutput {
 	private OutputStatus status;
 	private String message;
 	private Map<String,Object> output;

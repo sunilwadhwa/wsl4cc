@@ -2,7 +2,7 @@ package com.sap.ateam.wsl4cc.io;
 
 import java.util.Map;
 
-public class Rest4ccInput {
+public class Wsl4ccInput {
 	private String methodType;
 	private String methodName;
 	private Map<String, Object> methodParams;

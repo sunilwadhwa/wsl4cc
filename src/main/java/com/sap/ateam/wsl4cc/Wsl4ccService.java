@@ -9,8 +9,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import com.sap.ateam.wsl4cc.io.OutputStatus;
-import com.sap.ateam.wsl4cc.io.Rest4ccInput;
-import com.sap.ateam.wsl4cc.io.Rest4ccOutput;
+import com.sap.ateam.wsl4cc.io.Wsl4ccInput;
+import com.sap.ateam.wsl4cc.io.Wsl4ccOutput;
 import com.sap.ateam.wsl4cc.util.ConversionUtil;
 import com.sap.conn.jco.JCoDestination;
 import com.sap.conn.jco.JCoDestinationManager;
@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/")
-public class Rest4ccService {
+public class Wsl4ccService {
 
 	@GET
 	@Path("/{dest}/ping")
@@ -43,10 +43,10 @@ public class Rest4ccService {
 	@POST
 	@Path("/{dest}")
 	@Consumes("application/json")
-	public Rest4ccOutput invokeService(@PathParam("dest") String dest, final Rest4ccInput input) {
-		Rest4ccOutput output = new Rest4ccOutput();
-		JCoDestination destination = Rest4ccDestination.getDestination(dest);
-		JCoFunction func = Rest4ccDestination.getFunction(destination, input.getMethodName());
+	public Wsl4ccOutput invokeService(@PathParam("dest") String dest, final Wsl4ccInput input) {
+		Wsl4ccOutput output = new Wsl4ccOutput();
+		JCoDestination destination = Wsl4ccDestination.getDestination(dest);
+		JCoFunction func = Wsl4ccDestination.getFunction(destination, input.getMethodName());
 
 		// Prepare input parameters
         JCoParameterList imports = func.getImportParameterList();
@@ -86,5 +86,5 @@ public class Rest4ccService {
 		return output;
 	}
 	
-    private Logger logger = LoggerFactory.getLogger(Rest4ccService.class);
+    private Logger logger = LoggerFactory.getLogger(Wsl4ccService.class);
 }
