@@ -6,6 +6,7 @@ public class Wsl4ccInput {
 	private String methodType;
 	private String methodName;
 	private Map<String, Object> methodParams;
+	private Map<String, Object> methodTables;
 	
 	public String getMethodType() {
 		return methodType;
@@ -24,5 +25,11 @@ public class Wsl4ccInput {
 	}
 	public void setMethodParams(Map<String, Object> methodParams) {
 		this.methodParams = methodParams;
+	}
+	public Map<String, Object> getMethodTables() {
+		return methodTables;
+	}
+	public void setMethodTables(Map<String, Object> methodTables) {
+		this.methodTables = methodTables;
 	}
 }

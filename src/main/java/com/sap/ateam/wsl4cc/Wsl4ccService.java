@@ -1,5 +1,7 @@
 package com.sap.ateam.wsl4cc;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -9,6 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import com.sap.ateam.wsl4cc.io.OutputStatus;
+import com.sap.ateam.wsl4cc.io.Wsl4ccError;
 import com.sap.ateam.wsl4cc.io.Wsl4ccInput;
 import com.sap.ateam.wsl4cc.io.Wsl4ccOutput;
 import com.sap.ateam.wsl4cc.util.ConversionUtil;
@@ -50,19 +53,43 @@ public class Wsl4ccService {
 
 		// Prepare input parameters
         JCoParameterList imports = func.getImportParameterList();
+        Map<String,Object> map = input.getMethodParams();
+        List<String> paramNames = new ArrayList<>();
         
         JCoParameterFieldIterator iterator = imports.getParameterFieldIterator();
         while (iterator.hasNextField()) {
         	JCoParameterField field = iterator.nextParameterField();
-        	logger.debug("Looking for field name {} of type {}", field.getName(), field.getTypeAsString());
+        	String name = field.getName();
+        	paramNames.add(name);
+        	
+        	if (map != null && map.containsKey(name)) {
+            	logger.debug("Found input field name {} of type {} with value {}", name, field.getTypeAsString(), map.get(name));
+        		imports.setValue(name, map.get(name));
+        	} else {
+        		logger.debug("Setting default value for input field name {}", name);
+        		imports.setValue(name, (String) null);
+        	}
         }
         
-        Map<String,Object> map = input.getMethodParams();
+        // Check validity of other parameters
         if (map != null && map.size() > 0) {
         	for (Map.Entry<String,Object> i: input.getMethodParams().entrySet()) {
         		String name = i.getKey();
-        		Object value = i.getValue();
-                imports.setValue(name, value);
+        		if (!paramNames.contains(name)) {
+        			return new Wsl4ccError("Unrecognized input parameter " + name);
+        		}
+        	}
+        }
+        
+        // Check for input tables
+        JCoParameterList tables = func.getTableParameterList();
+        if (tables != null) {
+        	iterator = tables.getParameterFieldIterator();
+        	while (iterator.hasNextField()) {
+        		JCoParameterField field = iterator.nextParameterField();
+        		if (field.isImport()) {
+        			logger.debug("Looking for input table {}", field.getName());
+        		}
         	}
         }
 
@@ -80,7 +107,7 @@ public class Wsl4ccService {
         output.setOutput(ConversionUtil.convertParameterListToMap(exports));
         
         // Return tables
-        JCoParameterList tables = func.getTableParameterList();
+        tables = func.getTableParameterList();
         output.setTables(ConversionUtil.convertParameterListToMap(tables));
         
 		return output;
