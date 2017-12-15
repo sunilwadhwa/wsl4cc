@@ -50,6 +50,9 @@ public class Wsl4ccService {
 		Wsl4ccOutput output = new Wsl4ccOutput();
 		JCoDestination destination = Wsl4ccDestination.getDestination(dest);
 		JCoFunction func = Wsl4ccDestination.getFunction(destination, input.getMethodName());
+		
+		if (func == null)
+			return new Wsl4ccError("Unrecognized RFC function " + input.getMethodName());
 
 		// Prepare input parameters
         JCoParameterList imports = func.getImportParameterList();
@@ -87,11 +90,13 @@ public class Wsl4ccService {
         	iterator = tables.getParameterFieldIterator();
         	while (iterator.hasNextField()) {
         		JCoParameterField field = iterator.nextParameterField();
-        		if (field.isImport()) {
-        			logger.debug("Looking for input table {}", field.getName());
-        		}
+        		logger.debug("Table parameter name {} isActive = {} isImport = {}", field.getName(), field.isActive(), field.isImport());
+        		// TODO: TODO: Read input table and assign to parameter.
+        		// tables.setValue(field.getName(), table);
         	}
         }
+        
+        
 
         // Execute the function
         try {
