@@ -1,11 +1,13 @@
 package com.sap.ateam.wsl4cc.util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sap.ateam.wsl4cc.Wsl4ccException;
 import com.sap.conn.jco.JCoField;
 import com.sap.conn.jco.JCoListMetaData;
 import com.sap.conn.jco.JCoMetaData;
@@ -57,6 +59,26 @@ public class ConversionUtil {
 		return ret;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static JCoTable convertToJCoTable(JCoTable table, Object object) throws Wsl4ccException {
+		if (!(object instanceof List<?>))
+			throw new Wsl4ccException("User input was not a list.");
+		
+		List<Object> list = (List<Object>) object;
+		for (Object o : list) {
+			if (o instanceof Map<?,?>) {
+				Map<String, Object> map = (Map<String,Object>) o;
+				table.appendRow();
+				for (Map.Entry<String, Object> e : map.entrySet()) {
+					table.setValue(e.getKey(), e.getValue());
+				}
+			} else {
+				throw new Wsl4ccException("User input was not a map.");
+			}
+		}
+		return table;
+	}
+	
 	public static Map<String,Object> convertParameterListToMap(JCoParameterList pList) {
 		if (pList == null) return null;
 		
@@ -75,4 +97,5 @@ public class ConversionUtil {
 	}
 	
     private static Logger logger = LoggerFactory.getLogger(ConversionUtil.class);
+
 }
