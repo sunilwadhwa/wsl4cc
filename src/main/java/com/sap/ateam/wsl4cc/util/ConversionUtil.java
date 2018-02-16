@@ -55,7 +55,8 @@ public class ConversionUtil {
 				break;
 				
 			default:
-				ret = "UNRECOGNIZED TYPE:" + field.getClassNameOfValue();
+				ret = null;
+				logger.error("Unrecognized type " + field.getClassNameOfValue() + " for field " + field.getName());
 				break;
 		}
 		
@@ -67,7 +68,7 @@ public class ConversionUtil {
 		
 		switch (field.getType()) {
 			case JCoMetaData.TYPE_DATE:
-				Date d = DateUtils.parseDate((String) value, new String[] {"MM/DD/YYYY", "MM.DD.YYYY"});
+				Date d = DateUtils.parseDate((String) value, new String[] {"YYYY-MM-DD"}); // TODO: Make dateFormat a query parameter.
 				record.setValue(name, d);
 				break;
 
@@ -107,14 +108,12 @@ public class ConversionUtil {
         while (iterator.hasNextField()) {
         	JCoParameterField field = iterator.nextParameterField();
 			Object value = convertJCoFieldToPrimitive(field);
-			// logger.debug("Adding field " + field.getName() + ", class = " + field.getClassNameOfValue() + ", size = " + (field.isTable() ? ((JCoTable) value).getNumRows() : 0));
         	pMap.put(field.getName(), value);
         }
         
         return pMap;
 	}
 	
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.getLogger(ConversionUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(ConversionUtil.class);
 
 }

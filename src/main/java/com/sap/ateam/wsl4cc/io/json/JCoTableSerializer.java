@@ -29,7 +29,7 @@ public class JCoTableSerializer extends StdSerializer<JCoTable> {
 	public void serialize(JCoTable table, JsonGenerator jgen, SerializerProvider sprovider) throws IOException {
 		int i = 0;
 		
-		logger.debug("Writing table {} with {} row(s)", table.getRecordMetaData().getName(), table.getNumRows());
+		logger.debug("Writing table {} with {} row(s)", table.getMetaData().getName(), table.getNumRows());
 		
 		jgen.writeStartArray();
 

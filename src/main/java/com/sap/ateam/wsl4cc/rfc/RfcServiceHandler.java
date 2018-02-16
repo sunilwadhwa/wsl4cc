@@ -33,8 +33,10 @@ public class RfcServiceHandler implements ServiceHandler {
 	@Override
 	public Wsl4ccOutput execute(Wsl4ccInput input) throws Wsl4ccException {
 		JCoDestination destination = Wsl4ccDestination.getDestination(dest);
-		JCoFunction func = Wsl4ccDestination.getFunction(destination, input.getName());
+		if (destination == null || !destination.isValid())
+			return new Wsl4ccError("Unrecognized RFC destination " + dest);
 		
+		JCoFunction func = Wsl4ccDestination.getFunction(destination, input.getName());
 		if (func == null)
 			return new Wsl4ccError("Unrecognized RFC function " + input.getName());
 

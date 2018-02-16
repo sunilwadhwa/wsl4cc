@@ -17,7 +17,7 @@ public class JacksonObjectMapperProvider implements ContextResolver<ObjectMapper
     final ObjectMapper defaultObjectMapper;
 
     public JacksonObjectMapperProvider() {
-    	logger.debug("Registering custom JSON object mapper for rest4cc.");
+    	logger.debug("Registering custom JSON object mapper for wsl4cc.");
         defaultObjectMapper = createDefaultMapper();
     }
 
