@@ -79,7 +79,8 @@ public class RfcServiceHandler implements ServiceHandler {
         	
         	if (userInputMap != null && userInputMap.containsKey(name)) {
             	logger.debug("Found input field name {} of type {} with value {}", name, field.getTypeAsString(), userInputMap.get(name));
-        		imports.setValue(name, userInputMap.get(name));
+            	ConversionUtil.convertPrimitiveToJCoField(imports, name, userInputMap.get(name));
+        		// imports.setValue(name, userInputMap.get(name));
         	} else {
         		logger.debug("Setting default value for input field name {}", name);
         		imports.setValue(name, (String) null);
@@ -101,6 +102,9 @@ public class RfcServiceHandler implements ServiceHandler {
         JCoParameterList tables = func.getTableParameterList();
         Map<String,Object> userTableMap = input.getMethodTables();
         List<String> tableNames = new ArrayList<>();
+        
+        if (tables == null)
+        	return;
         
         JCoParameterFieldIterator iterator = tables.getParameterFieldIterator();
         while (iterator.hasNextField()) {

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.sap.ateam.wsl4cc.util.ConversionUtil;
 import com.sap.conn.jco.JCoRecordField;
 import com.sap.conn.jco.JCoRecordFieldIterator;
-import com.sap.conn.jco.JCoRecordMetaData;
 import com.sap.conn.jco.JCoTable;
 
 public class JCoTableSerializer extends StdSerializer<JCoTable> {
@@ -30,17 +29,16 @@ public class JCoTableSerializer extends StdSerializer<JCoTable> {
 	public void serialize(JCoTable table, JsonGenerator jgen, SerializerProvider sprovider) throws IOException {
 		int i = 0;
 		
-		logger.debug("Writing table with row count: " + table.getNumRows());
+		logger.debug("Writing table {} with {} row(s)", table.getRecordMetaData().getName(), table.getNumRows());
 		
 		jgen.writeStartArray();
 
 		for (i = 0, table.setRow(i); i < table.getNumRows(); i++, table.setRow(i)) {
-			JCoRecordMetaData meta = table.getRecordMetaData();
 			JCoRecordFieldIterator iterator = table.getRecordFieldIterator();
 			jgen.writeStartObject();
 			while (iterator.hasNextField()) {
 				JCoRecordField field = iterator.nextRecordField();
-				Object value = ConversionUtil.convertJCoFieldToPrimitive(field, meta.getType(field.getName()));
+				Object value = ConversionUtil.convertJCoFieldToPrimitive(field);
 				jgen.writeObjectField(field.getName(), value);
 			}
 			jgen.writeEndObject();

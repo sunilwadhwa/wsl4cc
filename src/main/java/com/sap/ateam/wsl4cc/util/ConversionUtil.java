@@ -1,25 +1,28 @@
 package com.sap.ateam.wsl4cc.util;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.client.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sap.ateam.wsl4cc.Wsl4ccException;
 import com.sap.conn.jco.JCoField;
-import com.sap.conn.jco.JCoListMetaData;
 import com.sap.conn.jco.JCoMetaData;
 import com.sap.conn.jco.JCoParameterField;
 import com.sap.conn.jco.JCoParameterFieldIterator;
 import com.sap.conn.jco.JCoParameterList;
+import com.sap.conn.jco.JCoRecord;
 import com.sap.conn.jco.JCoTable;
 
 public class ConversionUtil {
 
-	public static Object convertJCoFieldToPrimitive(JCoField field, int type) {
+	public static Object convertJCoFieldToPrimitive(JCoField field) {
 		Object ret = null;
+		int type = field.getType();
 		
 		switch (type) {
 			case JCoMetaData.TYPE_CHAR:
@@ -30,8 +33,6 @@ public class ConversionUtil {
 			case JCoMetaData.TYPE_NUM:
 			case JCoMetaData.TYPE_BCD:
 			case JCoMetaData.TYPE_FLOAT:
-			case JCoMetaData.TYPE_DATE:
-			case JCoMetaData.TYPE_TIME:
 			case JCoMetaData.TYPE_STRING:
 			case JCoMetaData.TYPE_DECF16:
 			case JCoMetaData.TYPE_DECF34:
@@ -40,6 +41,8 @@ public class ConversionUtil {
 				
 			case JCoMetaData.TYPE_BYTE:
 			case JCoMetaData.TYPE_XSTRING:
+			case JCoMetaData.TYPE_DATE:
+			case JCoMetaData.TYPE_TIME:
 				ret = field.getString();
 				break;
 
@@ -59,6 +62,21 @@ public class ConversionUtil {
 		return ret;
 	}
 	
+	public static void convertPrimitiveToJCoField(JCoRecord record, String name, Object value) {
+		JCoField field = record.getField(name);
+		
+		switch (field.getType()) {
+			case JCoMetaData.TYPE_DATE:
+				Date d = DateUtils.parseDate((String) value, new String[] {"MM/DD/YYYY", "MM.DD.YYYY"});
+				record.setValue(name, d);
+				break;
+
+			default:
+				record.setValue(name, value);
+				break;
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public static JCoTable convertToJCoTable(JCoTable table, Object object) throws Wsl4ccException {
 		if (!(object instanceof List<?>))
@@ -70,7 +88,8 @@ public class ConversionUtil {
 				Map<String, Object> map = (Map<String,Object>) o;
 				table.appendRow();
 				for (Map.Entry<String, Object> e : map.entrySet()) {
-					table.setValue(e.getKey(), e.getValue());
+					convertPrimitiveToJCoField(table, e.getKey(), e.getValue());
+					// table.setValue(e.getKey(), e.getValue());
 				}
 			} else {
 				throw new Wsl4ccException("User input was not a map.");
@@ -84,18 +103,18 @@ public class ConversionUtil {
 		
         Map <String,Object> pMap = new HashMap<>();
         JCoParameterFieldIterator iterator = pList.getParameterFieldIterator();
-		JCoListMetaData meta = pList.getListMetaData();
         
         while (iterator.hasNextField()) {
         	JCoParameterField field = iterator.nextParameterField();
-			Object value = convertJCoFieldToPrimitive(field, meta.getType(field.getName()));
-			logger.debug("Adding field " + field.getName() + ", class = " + field.getClassNameOfValue() + ", size = " + (field.isTable() ? ((JCoTable) value).getNumRows() : 0));
+			Object value = convertJCoFieldToPrimitive(field);
+			// logger.debug("Adding field " + field.getName() + ", class = " + field.getClassNameOfValue() + ", size = " + (field.isTable() ? ((JCoTable) value).getNumRows() : 0));
         	pMap.put(field.getName(), value);
         }
         
         return pMap;
 	}
 	
-    private static Logger logger = LoggerFactory.getLogger(ConversionUtil.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.getLogger(ConversionUtil.class);
 
 }
