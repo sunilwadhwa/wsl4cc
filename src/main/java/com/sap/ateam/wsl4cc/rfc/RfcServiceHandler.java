@@ -33,10 +33,10 @@ public class RfcServiceHandler implements ServiceHandler {
 	@Override
 	public Wsl4ccOutput execute(Wsl4ccInput input) throws Wsl4ccException {
 		JCoDestination destination = Wsl4ccDestination.getDestination(dest);
-		JCoFunction func = Wsl4ccDestination.getFunction(destination, input.getMethodName());
+		JCoFunction func = Wsl4ccDestination.getFunction(destination, input.getName());
 		
 		if (func == null)
-			return new Wsl4ccError("Unrecognized RFC function " + input.getMethodName());
+			return new Wsl4ccError("Unrecognized RFC function " + input.getName());
 
 		// Prepare input parameters
 		Wsl4ccOutput output = new Wsl4ccOutput();
@@ -68,7 +68,7 @@ public class RfcServiceHandler implements ServiceHandler {
 
 	private void prepareImportsFromUserInput(JCoFunction func, Wsl4ccInput input) throws Wsl4ccException {
         JCoParameterList imports = func.getImportParameterList();
-        Map<String,Object> userInputMap = input.getMethodParams();
+        Map<String,Object> userInputMap = input.getInput();
         List<String> paramNames = new ArrayList<>();
         
         JCoParameterFieldIterator iterator = imports.getParameterFieldIterator();
@@ -89,7 +89,7 @@ public class RfcServiceHandler implements ServiceHandler {
         
         // Check validity of other parameters
         if (userInputMap != null && userInputMap.size() > 0) {
-        	for (Map.Entry<String,Object> i: input.getMethodParams().entrySet()) {
+        	for (Map.Entry<String,Object> i: input.getInput().entrySet()) {
         		String name = i.getKey();
         		if (!paramNames.contains(name)) {
         			throw new Wsl4ccException ("Unrecognized input parameter " + name);
@@ -100,7 +100,7 @@ public class RfcServiceHandler implements ServiceHandler {
 
 	private void prepareTablesFromUserInput(JCoFunction func, Wsl4ccInput input) throws Wsl4ccException {
         JCoParameterList tables = func.getTableParameterList();
-        Map<String,Object> userTableMap = input.getMethodTables();
+        Map<String,Object> userTableMap = input.getTables();
         List<String> tableNames = new ArrayList<>();
         
         if (tables == null)
@@ -125,7 +125,7 @@ public class RfcServiceHandler implements ServiceHandler {
         
         // Check validity of other parameters
         if (userTableMap != null && userTableMap.size() > 0) {
-        	for (Map.Entry<String,Object> i: input.getMethodTables().entrySet()) {
+        	for (Map.Entry<String,Object> i: input.getTables().entrySet()) {
         		String name = i.getKey();
         		if (!tableNames.contains(name)) {
         			throw new Wsl4ccException ("Unrecognized table parameter " + name);

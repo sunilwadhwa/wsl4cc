@@ -3,33 +3,33 @@ package com.sap.ateam.wsl4cc.io;
 import java.util.Map;
 
 public class Wsl4ccInput {
-	private String methodType;
-	private String methodName;
-	private Map<String, Object> methodParams;
-	private Map<String, Object> methodTables;
+	private String type;
+	private String name;
+	private Map<String, Object> input;
+	private Map<String, Object> tables;
 	
-	public String getMethodType() {
-		return methodType;
+	public String getType() {
+		return type;
 	}
-	public void setMethodType(String methodType) {
-		this.methodType = methodType;
+	public void setType(String type) {
+		this.type = type;
 	}
-	public String getMethodName() {
-		return methodName;
+	public String getName() {
+		return name;
 	}
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
+	public void setName(String name) {
+		this.name = name;
 	}
-	public Map<String, Object> getMethodParams() {
-		return methodParams;
+	public Map<String, Object> getInput() {
+		return input;
 	}
-	public void setMethodParams(Map<String, Object> methodParams) {
-		this.methodParams = methodParams;
+	public void setInput(Map<String, Object> input) {
+		this.input = input;
 	}
-	public Map<String, Object> getMethodTables() {
-		return methodTables;
+	public Map<String, Object> getTables() {
+		return tables;
 	}
-	public void setMethodTables(Map<String, Object> methodTables) {
-		this.methodTables = methodTables;
+	public void setTables(Map<String, Object> tables) {
+		this.tables = tables;
 	}
 }
