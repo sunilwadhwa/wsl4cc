@@ -10,10 +10,8 @@ import com.sap.ateam.wsl4cc.handler.ServiceHandler;
 import com.sap.ateam.wsl4cc.io.Wsl4ccError;
 import com.sap.ateam.wsl4cc.io.Wsl4ccInput;
 import com.sap.ateam.wsl4cc.io.Wsl4ccOutput;
+import com.sap.ateam.wsl4cc.ping.PingServiceHandler;
 import com.sap.ateam.wsl4cc.rfc.RfcServiceHandler;
-import com.sap.conn.jco.JCoDestination;
-import com.sap.conn.jco.JCoDestinationManager;
-import com.sap.conn.jco.JCoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,17 +20,19 @@ public class Wsl4ccService {
 
 	@GET
 	@Path("/destinations/{dest}/ping")
-	public String pingService(@PathParam("dest") String dest) {
-		String str = null;
-        try {
-			JCoDestination destination = JCoDestinationManager.getDestination(dest);
-			str = (destination.isValid() ? "OK" : "FAILED");
-		} catch (JCoException jcoe) {
-		    logger.info("Exception occured while getting destination " + dest, jcoe);
-			str = "UNKNOWN";
+	public Wsl4ccOutput pingService(@PathParam("dest") String dest) {
+		Wsl4ccOutput output = null;
+		ServiceHandler pingServiceHandler = new PingServiceHandler();
+		pingServiceHandler.initialize(dest);
+		
+		try {
+			output = pingServiceHandler.execute(null);
+		} catch (Wsl4ccException e) {
+		    logger.error("Exception occured while getting destination " + dest, e);
+			output = new Wsl4ccError("Exception occured while getting destination " + dest + ": " + e.getMessage());
 		}
-        
-        return str;
+		
+		return output;
 	}
 	
 	@POST
