@@ -35,6 +35,9 @@ public class RfcServiceHandler implements ServiceHandler {
 		JCoDestination destination = Wsl4ccDestination.getDestination(dest);
 		if (destination == null || !destination.isValid())
 			return new Wsl4ccError("Unrecognized RFC destination " + dest);
+
+		if (input.getName() == null || input.getName().isEmpty())
+			return new Wsl4ccError("Empty or null RFC function name not allowed");
 		
 		JCoFunction func = Wsl4ccDestination.getFunction(destination, input.getName());
 		if (func == null)
@@ -68,6 +71,13 @@ public class RfcServiceHandler implements ServiceHandler {
 		return output;
 	}
 
+	/**
+	 * Parse the user provided input and create the imports parameter to be used during invocation of RFC function.
+	 * 
+	 * @param func JCoFunction that corresponds to the RFC
+	 * @param input User provided input
+	 * @throws Wsl4ccException
+	 */
 	private void prepareImportsFromUserInput(JCoFunction func, Wsl4ccInput input) throws Wsl4ccException {
         JCoParameterList imports = func.getImportParameterList();
         Map<String,Object> userInputMap = input.getInput();
@@ -82,9 +92,8 @@ public class RfcServiceHandler implements ServiceHandler {
         	if (userInputMap != null && userInputMap.containsKey(name)) {
             	logger.debug("Found input field name {} of type {} with value {}", name, field.getTypeAsString(), userInputMap.get(name));
             	ConversionUtil.convertPrimitiveToJCoField(imports, name, userInputMap.get(name));
-        		// imports.setValue(name, userInputMap.get(name));
         	} else {
-        		logger.debug("Setting default value for input field name {}", name);
+        		// logger.debug("Setting default value for input field name {}", name);
         		imports.setValue(name, (String) null);
         	}
         }
@@ -94,12 +103,19 @@ public class RfcServiceHandler implements ServiceHandler {
         	for (Map.Entry<String,Object> i: input.getInput().entrySet()) {
         		String name = i.getKey();
         		if (!paramNames.contains(name)) {
-        			throw new Wsl4ccException ("Unrecognized input parameter " + name);
+        			throw new Wsl4ccException ("Unrecognized or invalid input parameter " + name);
         		}
         	}
         }
 	}
 
+	/**
+	 * Parse the user provided input table(s) and create the tables parameter to be used during invocation of RFC function.
+	 * 
+	 * @param func JCoFunction that corresponds to the RFC
+	 * @param input User provided input
+	 * @throws Wsl4ccException
+	 */
 	private void prepareTablesFromUserInput(JCoFunction func, Wsl4ccInput input) throws Wsl4ccException {
         JCoParameterList tables = func.getTableParameterList();
         Map<String,Object> userTableMap = input.getTables();
@@ -117,11 +133,12 @@ public class RfcServiceHandler implements ServiceHandler {
         	if (userTableMap != null && userTableMap.containsKey(name)) {
             	logger.debug("Found input table name {} of type {} with value {}", name, field.getTypeAsString(), userTableMap.get(name));
             	JCoTable table = tables.getTable(name);
-            	ConversionUtil.convertToJCoTable(table, userTableMap.get(name));
-        		tables.setValue(name, table);
-        	} else {
-        		logger.debug("Setting default value for input table name {}", name);
-        		// tables.setValue(name, (JCoTable) null);
+            	if (userTableMap.get(name) instanceof List<?>) {
+                	ConversionUtil.convertToJCoTable(table, (List<?>) userTableMap.get(name));
+            		tables.setValue(name, table);
+            	} else {
+            		throw new Wsl4ccException ("Table parameter " + name + " must be input as an array.");
+            	}
         	}
         }
         
@@ -130,7 +147,7 @@ public class RfcServiceHandler implements ServiceHandler {
         	for (Map.Entry<String,Object> i: input.getTables().entrySet()) {
         		String name = i.getKey();
         		if (!tableNames.contains(name)) {
-        			throw new Wsl4ccException ("Unrecognized table parameter " + name);
+        			throw new Wsl4ccException ("Unrecognized or invalid table parameter " + name);
         		}
         	}
         }

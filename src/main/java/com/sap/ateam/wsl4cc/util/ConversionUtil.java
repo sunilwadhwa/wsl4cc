@@ -78,24 +78,28 @@ public class ConversionUtil {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public static JCoTable convertToJCoTable(JCoTable table, Object object) throws Wsl4ccException {
-		if (!(object instanceof List<?>))
-			throw new Wsl4ccException("User input was not a list.");
-		
-		List<Object> list = (List<Object>) object;
-		for (Object o : list) {
-			if (o instanceof Map<?,?>) {
-				Map<String, Object> map = (Map<String,Object>) o;
-				table.appendRow();
-				for (Map.Entry<String, Object> e : map.entrySet()) {
-					convertPrimitiveToJCoField(table, e.getKey(), e.getValue());
-					// table.setValue(e.getKey(), e.getValue());
+	public static JCoTable convertToJCoTable(JCoTable table, List<?> list) throws Wsl4ccException {
+		if (list != null && table != null) {
+			JCoMetaData meta = table.getMetaData();
+			for (Object o : list) {
+				if (o instanceof Map<?,?>) {
+					Map<?,?> map = (Map<?,?>) o;
+					table.appendRow();
+					for (Map.Entry<?,?> e : map.entrySet()) {
+						String name = (String) e.getKey();
+						Object value = (Object) e.getValue();
+						
+						if (meta.hasField(name))
+							convertPrimitiveToJCoField(table, name, value);
+						else
+							throw new Wsl4ccException("Unrecognized or invalid field " + name + " in table " + meta.getName());
+					}
+				} else {
+					throw new Wsl4ccException("User input for table " + meta.getName() + " is not a valid map.");
 				}
-			} else {
-				throw new Wsl4ccException("User input was not a map.");
 			}
 		}
+		
 		return table;
 	}
 	
