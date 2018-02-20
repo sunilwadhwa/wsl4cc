@@ -63,6 +63,40 @@ public class ConversionUtil {
 		return ret;
 	}
 	
+	/**
+	 * Convert a user provided List to a JCoTable input table.
+	 * 
+	 * @param tableName Name of input table parameter
+	 * @param table JCoTable 
+	 * @param list User provided list
+	 * @return Resulting table
+	 * @throws Wsl4ccException
+	 */
+	public static JCoTable convertToJCoTable(String tableName, JCoTable table, List<?> list) throws Wsl4ccException {
+		if (list == null || table == null)
+			return table;
+		
+		JCoMetaData meta = table.getMetaData();
+		for (Object o : list) {
+			if (!(o instanceof Map<?,?>))
+				throw new Wsl4ccException("User input for table " + tableName + " is not a valid map.");
+			
+			Map<?,?> map = (Map<?,?>) o;
+			table.appendRow();
+			for (Map.Entry<?,?> e : map.entrySet()) {
+				String fieldName = (String) e.getKey();
+				Object fieldValue = (Object) e.getValue();
+				
+				if (meta.hasField(fieldName))
+					convertPrimitiveToJCoField(table, fieldName, fieldValue);
+				else
+					throw new Wsl4ccException("Unrecognized or invalid field " + fieldName + " in table " + tableName);
+			}
+		}
+		
+		return table;
+	}
+	
 	public static void convertPrimitiveToJCoField(JCoRecord record, String name, Object value) {
 		JCoField field = record.getField(name);
 		
@@ -78,31 +112,6 @@ public class ConversionUtil {
 		}
 	}
 
-	public static JCoTable convertToJCoTable(JCoTable table, List<?> list) throws Wsl4ccException {
-		if (list != null && table != null) {
-			JCoMetaData meta = table.getMetaData();
-			for (Object o : list) {
-				if (o instanceof Map<?,?>) {
-					Map<?,?> map = (Map<?,?>) o;
-					table.appendRow();
-					for (Map.Entry<?,?> e : map.entrySet()) {
-						String name = (String) e.getKey();
-						Object value = (Object) e.getValue();
-						
-						if (meta.hasField(name))
-							convertPrimitiveToJCoField(table, name, value);
-						else
-							throw new Wsl4ccException("Unrecognized or invalid field " + name + " in table " + meta.getName());
-					}
-				} else {
-					throw new Wsl4ccException("User input for table " + meta.getName() + " is not a valid map.");
-				}
-			}
-		}
-		
-		return table;
-	}
-	
 	public static Map<String,Object> convertParameterListToMap(JCoParameterList pList) {
 		if (pList == null) return null;
 		

@@ -134,7 +134,7 @@ public class RfcServiceHandler implements ServiceHandler {
             	logger.debug("Found input table name {} of type {} with value {}", name, field.getTypeAsString(), userTableMap.get(name));
             	JCoTable table = tables.getTable(name);
             	if (userTableMap.get(name) instanceof List<?>) {
-                	ConversionUtil.convertToJCoTable(table, (List<?>) userTableMap.get(name));
+                	ConversionUtil.convertToJCoTable(name, table, (List<?>) userTableMap.get(name));
             		tables.setValue(name, table);
             	} else {
             		throw new Wsl4ccException ("Table parameter " + name + " must be input as an array.");
