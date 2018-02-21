@@ -1,15 +1,18 @@
 package com.sap.ateam.wsl4cc.util;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.client.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sap.ateam.wsl4cc.Wsl4ccException;
+import com.sap.conn.jco.ConversionException;
 import com.sap.conn.jco.JCoField;
 import com.sap.conn.jco.JCoMetaData;
 import com.sap.conn.jco.JCoParameterField;
@@ -97,17 +100,30 @@ public class ConversionUtil {
 		return table;
 	}
 	
-	public static void convertPrimitiveToJCoField(JCoRecord record, String name, Object value) {
+	public static void convertPrimitiveToJCoField(JCoRecord record, String name, Object value) throws Wsl4ccException {
 		JCoField field = record.getField(name);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd"); // TODO: Make dateFormat a query parameter.
+		df.setLenient(false);
 		
 		switch (field.getType()) {
 			case JCoMetaData.TYPE_DATE:
-				Date d = DateUtils.parseDate((String) value, new String[] {"YYYY-MM-DD"}); // TODO: Make dateFormat a query parameter.
-				record.setValue(name, d);
+				try {
+					Date d = df.parse((String) value);
+					record.setValue(name, d);
+				} catch (ClassCastException | ParseException pe) {
+					String m = "Cannot convert a value of '" + value + "' from type " + value.getClass() + " to " + field.getTypeAsString() + " at field " + field.getName();
+					throw new Wsl4ccException(m);
+				}
 				break;
 
 			default:
-				record.setValue(name, value);
+				try {
+					record.setValue(name, value);
+				} catch (ConversionException ce) {
+					// The ConversionException has a good message that we can reuse for our purpose.
+					// E.g.: Cannot convert a value of 'ABCD' from type java.lang.String to INT at field MAX_CNT
+					throw new Wsl4ccException(ce.getMessage());
+				}
 				break;
 		}
 	}
