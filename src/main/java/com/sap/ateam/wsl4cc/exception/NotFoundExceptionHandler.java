@@ -11,8 +11,8 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class NotFoundExceptionHandler implements ExceptionMapper<NotFoundException> {
 
-     @Context
-     private HttpHeaders headers;
+    @Context
+    private HttpHeaders headers;
 
     public Response toResponse(NotFoundException ex){
         return Response.status(Status.NOT_FOUND).build();

@@ -10,12 +10,14 @@ public class Wsl4ccApplication extends Application {
 
 /*
  * TODO:
- * 1. (med) Swagger documentation for API and Javadoc for classes
+ * 1. (hi) Work on security options - NONE, BASIC, SAML.
  * 2. (hi) Create unique request # and log that for tracking and identification
  * 3. (hi) Test timestamp data type (not just date, but full timestamp)
- * 4. (med) Convert to MTA, so that you can publish your app to others
- * 5. (med) Parameterize date format and time format
- * 6. (low) Implement GET endpoint to get list of destinations
- * 8. (hi) Handle invalid input data type, i.e. what will happen if character is expected, but boolean is given??
- * 9. 
+ * 4. (hi) Basic documentation (blog) to download and install
+ * 
+ * 11. (med) Convert to MTA, so that you can publish your app to others
+ * 12. (med) Parameterize date format and time format
+ * 13. (med) Swagger documentation for API and Javadoc for classes
+ * 
+ * 21. (low) Implement GET endpoint to get list of destinations
  */
