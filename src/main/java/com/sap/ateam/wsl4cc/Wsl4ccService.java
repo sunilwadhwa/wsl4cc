@@ -1,6 +1,7 @@
 package com.sap.ateam.wsl4cc;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -24,34 +25,35 @@ public class Wsl4ccService {
 		Wsl4ccOutput output = null;
 		ServiceHandler pingServiceHandler = new PingServiceHandler();
 		pingServiceHandler.initialize(dest);
-		
+
 		try {
 			output = pingServiceHandler.execute(null);
 		} catch (Wsl4ccException e) {
 		    logger.error("Exception occured while getting destination " + dest, e);
 			output = new Wsl4ccError("Exception occured while getting destination " + dest + ": " + e.getMessage());
 		}
-		
+
 		return output;
 	}
-	
+
 	@POST
 	@Path("/destinations/{dest}/rfc")
 	@Consumes("application/json")
+	@Produces("application/json")
 	public Wsl4ccOutput invokeRfcService(@PathParam("dest") String dest, final Wsl4ccInput input) {
 		Wsl4ccOutput output = null;
 		ServiceHandler rfcServiceHandler = new RfcServiceHandler();
 		rfcServiceHandler.initialize(dest);
-		
+
 		try {
 			output = rfcServiceHandler.execute(input);
 		} catch (Wsl4ccException e) {
 			logger.error("Exception occured while executing RFC service on destination " + dest, e);
 			output = new Wsl4ccError("Exception occured while executing RFC service on destination " + dest + ": " + e.getMessage());
 		}
-		
+
 		return output;
 	}
-	
+
     private Logger logger = LoggerFactory.getLogger(Wsl4ccService.class);
 }
