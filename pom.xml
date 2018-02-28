@@ -25,13 +25,11 @@
     <artifactId>resteasy-jaxrs</artifactId>
     <version>3.1.4.Final</version>
 	</dependency>
-	<!-- 
 	<dependency>
     <groupId>org.jboss.resteasy</groupId>
     <artifactId>resteasy-jaxb-provider</artifactId>
     <version>3.1.4.Final</version>
 	</dependency>
-	-->
 	<dependency>
     <groupId>org.jboss.resteasy</groupId>
     <artifactId>resteasy-servlet-initializer</artifactId>
@@ -42,7 +40,7 @@
 	<artifactId>resteasy-jackson2-provider</artifactId>
 	<version>3.1.4.Final</version>
 	</dependency>
-	<dependency> 
+	<dependency>
   	<groupId>org.slf4j</groupId>
   	<artifactId>slf4j-log4j12</artifactId>
   	<version>1.8.0-beta0</version>
