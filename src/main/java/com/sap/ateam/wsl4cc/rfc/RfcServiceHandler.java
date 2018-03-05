@@ -38,7 +38,7 @@ public class RfcServiceHandler implements ServiceHandler {
 
 		if (input.getName() == null || input.getName().isEmpty())
 			return new Wsl4ccError("Empty or null RFC function name not allowed");
-		
+
 		JCoFunction func = Wsl4ccDestination.getFunction(destination, input.getName());
 		if (func == null)
 			return new Wsl4ccError("Unrecognized RFC function " + input.getName());
@@ -46,10 +46,10 @@ public class RfcServiceHandler implements ServiceHandler {
 		// Prepare input parameters
 		Wsl4ccOutput output = new Wsl4ccOutput();
         prepareImportsFromUserInput (func, input);
-        
+
         // Prepare input tables, if any
         prepareTablesFromUserInput (func, input);
-        
+
 
         // Execute the function
         try {
@@ -63,17 +63,17 @@ public class RfcServiceHandler implements ServiceHandler {
         // Return output variables
         JCoParameterList exports = func.getExportParameterList();
         output.setOutput(ConversionUtil.convertParameterListToMap(exports));
-        
+
         // Return tables
         JCoParameterList tables = func.getTableParameterList();
         output.setTables(ConversionUtil.convertParameterListToMap(tables));
-        
+
 		return output;
 	}
 
 	/**
 	 * Parse the user provided input and create the imports parameter to be used during invocation of RFC function.
-	 * 
+	 *
 	 * @param func JCoFunction that corresponds to the RFC
 	 * @param input User provided input
 	 * @throws Wsl4ccException
@@ -82,13 +82,16 @@ public class RfcServiceHandler implements ServiceHandler {
         JCoParameterList imports = func.getImportParameterList();
         Map<String,Object> userInputMap = input.getInput();
         List<String> paramNames = new ArrayList<>();
-        
+
+        if (imports == null)
+        	return;
+
         JCoParameterFieldIterator iterator = imports.getParameterFieldIterator();
         while (iterator.hasNextField()) {
         	JCoParameterField field = iterator.nextParameterField();
         	String name = field.getName();
         	paramNames.add(name);
-        	
+
         	if (userInputMap != null && userInputMap.containsKey(name)) {
             	logger.debug("Found input field name {} of type {} with value {}", name, field.getTypeAsString(), userInputMap.get(name));
             	ConversionUtil.convertPrimitiveToJCoField(imports, name, userInputMap.get(name));
@@ -97,7 +100,7 @@ public class RfcServiceHandler implements ServiceHandler {
         		imports.setValue(name, (String) null);
         	}
         }
-        
+
         // Check validity of other parameters
         if (userInputMap != null && userInputMap.size() > 0) {
         	for (Map.Entry<String,Object> i: input.getInput().entrySet()) {
@@ -111,7 +114,7 @@ public class RfcServiceHandler implements ServiceHandler {
 
 	/**
 	 * Parse the user provided input table(s) and create the tables parameter to be used during invocation of RFC function.
-	 * 
+	 *
 	 * @param func JCoFunction that corresponds to the RFC
 	 * @param input User provided input
 	 * @throws Wsl4ccException
@@ -120,16 +123,16 @@ public class RfcServiceHandler implements ServiceHandler {
         JCoParameterList tables = func.getTableParameterList();
         Map<String,Object> userTableMap = input.getTables();
         List<String> tableNames = new ArrayList<>();
-        
+
         if (tables == null)
         	return;
-        
+
         JCoParameterFieldIterator iterator = tables.getParameterFieldIterator();
         while (iterator.hasNextField()) {
         	JCoParameterField field = iterator.nextParameterField();
         	String name = field.getName();
         	tableNames.add(name);
-        	
+
         	if (userTableMap != null && userTableMap.containsKey(name)) {
             	logger.debug("Found input table name {} of type {} with value {}", name, field.getTypeAsString(), userTableMap.get(name));
             	JCoTable table = tables.getTable(name);
@@ -141,7 +144,7 @@ public class RfcServiceHandler implements ServiceHandler {
             	}
         	}
         }
-        
+
         // Check validity of other parameters
         if (userTableMap != null && userTableMap.size() > 0) {
         	for (Map.Entry<String,Object> i: input.getTables().entrySet()) {
