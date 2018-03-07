@@ -3,15 +3,27 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>Archetype Created Web Application</display-name>
-  <servlet>
-  	<servlet-name>ConnectivityRfcServlet</servlet-name>
-  	<display-name>ConnectivityRfcServlet</display-name>
-  	<description></description>
-  	<servlet-class>com.sap.ateam.rest4saprfc.ConnectivityRfcServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-  	<servlet-name>ConnectivityRfcServlet</servlet-name>
-  	<url-pattern>/ConnectivityRfcServlet</url-pattern>
-  </servlet-mapping>
+  <display-name>WSL4CC: Web Service Layer for Cloud Connector</display-name>
+  
+  <filter>
+    <filter-name>Wsl4ccScopeFilter</filter-name>
+    <display-name>OAuth2 scope definition for using WSL4CC</display-name>
+    <filter-class>com.sap.cloud.security.oauth2.OAuthAuthorizationFilter</filter-class>
+    <init-param>
+      <param-name>scope</param-name>
+      <param-value>wsl4cc-scope</param-value>
+    </init-param>
+    <init-param>
+      <param-name>no-session</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>Wsl4ccScopeFilter</filter-name>
+    <url-pattern>/destinations/*</url-pattern>
+  </filter-mapping>
+  
+  <login-config>
+  	<auth-method>OAUTH</auth-method>
+  </login-config>
 </web-app>

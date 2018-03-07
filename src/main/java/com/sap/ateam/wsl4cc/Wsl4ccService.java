@@ -2,6 +2,7 @@ package com.sap.ateam.wsl4cc;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -21,6 +22,7 @@ public class Wsl4ccService {
 
 	@GET
 	@Path("/destinations/{dest}/ping")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Wsl4ccOutput pingService(@PathParam("dest") String dest) {
 		Wsl4ccOutput output = null;
 		ServiceHandler pingServiceHandler = new PingServiceHandler();
@@ -38,8 +40,8 @@ public class Wsl4ccService {
 
 	@POST
 	@Path("/destinations/{dest}/rfc")
-	@Consumes("application/json")
-	@Produces("application/json")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Wsl4ccOutput invokeRfcService(@PathParam("dest") String dest, final Wsl4ccInput input) {
 		Wsl4ccOutput output = null;
 		ServiceHandler rfcServiceHandler = new RfcServiceHandler();
