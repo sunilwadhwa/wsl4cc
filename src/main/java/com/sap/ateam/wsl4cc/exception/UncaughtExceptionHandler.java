@@ -1,5 +1,6 @@
 package com.sap.ateam.wsl4cc.exception;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -27,7 +28,7 @@ public class UncaughtExceptionHandler implements ExceptionMapper<Throwable> {
 		return Response
 				.status(Status.INTERNAL_SERVER_ERROR)
 				.entity(error)
-				.type("application/json")
+				.type(MediaType.APPLICATION_JSON)
 				.build();
 	}
 	

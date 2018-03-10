@@ -10,7 +10,7 @@ public class Wsl4ccApplication extends Application {
 
 /*
  * TODO:
- * 1. (hi) Work on security options - NONE, BASIC, SAML.
+ * 1. (hi) Implement timeout (default = 180s)
  * 2. (hi) Create unique request # and log that for tracking and identification
  * 3. (hi) Test timestamp data type (not just date, but full timestamp)
  * 4. (hi) Basic documentation (blog) to download and install

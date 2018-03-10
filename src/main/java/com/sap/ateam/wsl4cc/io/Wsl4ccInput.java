@@ -1,12 +1,17 @@
 package com.sap.ateam.wsl4cc.io;
 
 import java.util.Map;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Wsl4ccInput {
 	private String type;
 	private String name;
 	private Map<String, Object> input;
 	private Map<String, Object> tables;
+	@JsonIgnore
+	private UUID requestId = UUID.randomUUID();
 	
 	public String getType() {
 		return type;
@@ -31,5 +36,13 @@ public class Wsl4ccInput {
 	}
 	public void setTables(Map<String, Object> tables) {
 		this.tables = tables;
+	}
+	@JsonIgnore
+	public UUID getRequestId() {
+		return requestId;
+	}
+	@JsonIgnore
+	public void setRequestId(UUID requestId) {
+		this.requestId = requestId;
 	}
 }
