@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.sap.conn.jco.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +16,6 @@ import com.sap.ateam.wsl4cc.io.Wsl4ccError;
 import com.sap.ateam.wsl4cc.io.Wsl4ccInput;
 import com.sap.ateam.wsl4cc.io.Wsl4ccOutput;
 import com.sap.ateam.wsl4cc.util.ConversionUtil;
-import com.sap.conn.jco.JCoDestination;
-import com.sap.conn.jco.JCoException;
-import com.sap.conn.jco.JCoFunction;
-import com.sap.conn.jco.JCoParameterField;
-import com.sap.conn.jco.JCoParameterFieldIterator;
-import com.sap.conn.jco.JCoParameterList;
-import com.sap.conn.jco.JCoTable;
 
 public class RfcServiceHandler implements ServiceHandler {
 
@@ -43,22 +37,14 @@ public class RfcServiceHandler implements ServiceHandler {
 		if (func == null)
 			return new Wsl4ccError("Unrecognized RFC function " + input.getName());
 
-		// Prepare input parameters
-		Wsl4ccOutput output = new Wsl4ccOutput();
+	// Prepare input parameters
         prepareImportsFromUserInput (func, input);
 
         // Prepare input tables, if any
         prepareTablesFromUserInput (func, input);
 
-
         // Execute the function
-        try {
-        	func.execute(destination);
-        	output.setStatus(OutputStatus.OK);
-        } catch (JCoException jcoe) {
-        	output.setStatus(OutputStatus.ERROR);
-        	output.setMessage(jcoe.getMessage() == null ? "(null)" : jcoe.getMessage());
-        }
+		Wsl4ccOutput output = executeFunction(func, destination, input.isCommit());
 
         // Return output variables
         JCoParameterList exports = func.getExportParameterList();
@@ -154,6 +140,43 @@ public class RfcServiceHandler implements ServiceHandler {
         		}
         	}
         }
+
+	}
+
+	private Wsl4ccOutput executeFunction(JCoFunction function, JCoDestination destination, boolean commit) {
+		Wsl4ccOutput output = new Wsl4ccOutput();
+		boolean error = false;
+		String errorMessage = null;
+
+		try {
+			JCoContext.begin(destination);
+			function.execute(destination);
+
+			if (commit) {
+				JCoFunction commitFunction = Wsl4ccDestination.getFunction(destination, "BAPI_TRANSACTION_COMMIT");
+				commitFunction.execute(destination);
+			}
+
+			output.setStatus(OutputStatus.OK);
+
+		} catch (JCoException e) {
+			error = true;
+			errorMessage = e.getMessage();
+		} finally {
+			try {
+				JCoContext.end(destination);
+			} catch (JCoException e) {
+				error = true;
+				errorMessage = e.getMessage();
+			}
+		}
+
+		if (error) {
+			output.setStatus(OutputStatus.ERROR);
+			output.setMessage(errorMessage == null ? "(null)" : errorMessage);
+		}
+
+		return output;
 
 	}
 
