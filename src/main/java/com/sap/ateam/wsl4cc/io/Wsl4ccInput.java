@@ -10,9 +10,10 @@ public class Wsl4ccInput {
 	private String name;
 	private Map<String, Object> input;
 	private Map<String, Object> tables;
+	private boolean commit;
 	@JsonIgnore
 	private UUID requestId = UUID.randomUUID();
-	
+
 	public String getType() {
 		return type;
 	}
@@ -37,6 +38,9 @@ public class Wsl4ccInput {
 	public void setTables(Map<String, Object> tables) {
 		this.tables = tables;
 	}
+	public boolean isCommit() { return commit; }
+	public void setCommit(boolean commit) {	this.commit = commit; }
+
 	@JsonIgnore
 	public UUID getRequestId() {
 		return requestId;
