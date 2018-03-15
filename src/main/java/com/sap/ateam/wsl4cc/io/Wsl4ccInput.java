@@ -11,7 +11,6 @@ public class Wsl4ccInput {
 	private Map<String, Object> input;
 	private Map<String, Object> tables;
 	private Map<String, Object> options;
-
 	@JsonIgnore
 	private UUID requestId = UUID.randomUUID();
 
