@@ -44,7 +44,7 @@ public class RfcServiceHandler implements ServiceHandler {
         prepareTablesFromUserInput (func, input);
 
         // Execute the function
-	Wsl4ccOutput output = executeFunction(func, destination, input.isCommit());
+	Wsl4ccOutput output = executeFunction(func, destination, input);
 
         // Return output variables
         JCoParameterList exports = func.getExportParameterList();
@@ -143,7 +143,7 @@ public class RfcServiceHandler implements ServiceHandler {
 
 	}
 
-	private Wsl4ccOutput executeFunction(JCoFunction function, JCoDestination destination, boolean commit) {
+	private Wsl4ccOutput executeFunction(JCoFunction function, JCoDestination destination, final Wsl4ccInput input) {
 		Wsl4ccOutput output = new Wsl4ccOutput();
 		boolean error = false;
 		String errorMessage = null;
@@ -152,7 +152,7 @@ public class RfcServiceHandler implements ServiceHandler {
 			JCoContext.begin(destination);
 			function.execute(destination);
 
-			if (commit) {
+			if (input.getOptions().containsKey("commit") && (boolean) input.getOptions().get("commit")) {
 				JCoFunction commitFunction = Wsl4ccDestination.getFunction(destination, "BAPI_TRANSACTION_COMMIT");
 				commitFunction.execute(destination);
 			}
