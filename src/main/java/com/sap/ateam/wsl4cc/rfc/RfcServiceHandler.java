@@ -44,7 +44,7 @@ public class RfcServiceHandler implements ServiceHandler {
         prepareTablesFromUserInput (func, input);
 
         // Execute the function
-		Wsl4ccOutput output = executeFunction(func, destination, input.isCommit());
+	Wsl4ccOutput output = executeFunction(func, destination, input.isCommit());
 
         // Return output variables
         JCoParameterList exports = func.getExportParameterList();
@@ -181,5 +181,5 @@ public class RfcServiceHandler implements ServiceHandler {
 	}
 
 	private String dest;
-    private Logger logger = LoggerFactory.getLogger(RfcServiceHandler.class);
+	private Logger logger = LoggerFactory.getLogger(RfcServiceHandler.class);
 }
