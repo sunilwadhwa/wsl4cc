@@ -17,6 +17,8 @@ import com.sap.ateam.wsl4cc.io.Wsl4ccInput;
 import com.sap.ateam.wsl4cc.io.Wsl4ccOutput;
 import com.sap.ateam.wsl4cc.util.ConversionUtil;
 
+import javax.ws.rs.HEAD;
+
 public class RfcServiceHandler implements ServiceHandler {
 
 	@Override
@@ -37,22 +39,22 @@ public class RfcServiceHandler implements ServiceHandler {
 		if (func == null)
 			return new Wsl4ccError("Unrecognized RFC function " + input.getName());
 
-	// Prepare input parameters
-        prepareImportsFromUserInput (func, input);
+		// Prepare input parameters
+        	prepareImportsFromUserInput (func, input);
 
-        // Prepare input tables, if any
-        prepareTablesFromUserInput (func, input);
+	        // Prepare input tables, if any
+	        prepareTablesFromUserInput (func, input);
 
-        // Execute the function
-	Wsl4ccOutput output = executeFunction(func, destination, input.isCommit());
+        	// Execute the function
+		Wsl4ccOutput output = executeFunction(func, destination, input);
 
-        // Return output variables
-        JCoParameterList exports = func.getExportParameterList();
-        output.setOutput(ConversionUtil.convertParameterListToMap(exports));
+	        // Return output variables
+	        JCoParameterList exports = func.getExportParameterList();
+	        output.setOutput(ConversionUtil.convertParameterListToMap(exports));
 
-        // Return tables
-        JCoParameterList tables = func.getTableParameterList();
-        output.setTables(ConversionUtil.convertParameterListToMap(tables));
+	        // Return tables
+	        JCoParameterList tables = func.getTableParameterList();
+	        output.setTables(ConversionUtil.convertParameterListToMap(tables));
 
 		return output;
 	}
@@ -143,7 +145,8 @@ public class RfcServiceHandler implements ServiceHandler {
 
 	}
 
-	private Wsl4ccOutput executeFunction(JCoFunction function, JCoDestination destination, boolean commit) {
+
+	private Wsl4ccOutput executeFunction(JCoFunction function, JCoDestination destination, final Wsl4ccInput input) {
 		Wsl4ccOutput output = new Wsl4ccOutput();
 		boolean error = false;
 		String errorMessage = null;
@@ -152,7 +155,7 @@ public class RfcServiceHandler implements ServiceHandler {
 			JCoContext.begin(destination);
 			function.execute(destination);
 
-			if (commit) {
+			if (input.getOptions().containsKey("commit") && (boolean) input.getOptions().get("commit")) {
 				JCoFunction commitFunction = Wsl4ccDestination.getFunction(destination, "BAPI_TRANSACTION_COMMIT");
 				commitFunction.execute(destination);
 			}
