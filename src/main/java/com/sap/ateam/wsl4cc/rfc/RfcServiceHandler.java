@@ -155,7 +155,7 @@ public class RfcServiceHandler implements ServiceHandler {
 			JCoContext.begin(destination);
 			function.execute(destination);
 
-			if (input.getOptions().containsKey("commit") && (boolean) input.getOptions().get("commit")) {
+			if (input.readBooleanOption("commit")) {
 				JCoFunction commitFunction = Wsl4ccDestination.getFunction(destination, "BAPI_TRANSACTION_COMMIT");
 				commitFunction.execute(destination);
 			}

@@ -41,6 +41,30 @@ public class Wsl4ccInput {
 	public Map<String, Object> getOptions() { return options; }
 	public void setOptions(Map<String, Object> options) { this.options = options; }
 
+	public boolean readBooleanOption(String key) {
+		return optionKeyExists(key) && (boolean) this.readOption(key);
+	}
+
+	public String readStringOption(String key) {
+		return optionKeyExists(key) ? (String) this.readOption(key) : null;
+	}
+
+	public Double readDoubleOption(String key) {
+		return optionKeyExists(key) ? (Double) this.readOption(key) : null;
+	}
+
+	public Integer readIntegerOption(String key) {
+		return optionKeyExists(key) ? (Integer) this.readOption(key) : null;
+	}
+
+	public Object readOption(String key) {
+		return this.getOptions().get(key);
+	}
+
+	public boolean optionKeyExists(String key) {
+		return this.getOptions() != null && this.getOptions().containsKey(key);
+	}
+
 	@JsonIgnore
 	public UUID getRequestId() {
 		return requestId;
